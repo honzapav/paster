@@ -6,9 +6,10 @@ interface Preferences {
   openaiApiKey?: string;
   anthropicApiKey?: string;
   groqApiKey?: string;
+  geminiApiKey?: string;
   localModelEndpoint?: string;
   localModelName?: string;
-  preferredAiProvider: "openai" | "anthropic" | "groq" | "local";
+  preferredAiProvider: "openai" | "anthropic" | "groq" | "gemini" | "local";
 }
 
 type Provider = typeof AI_PROVIDERS[number];
@@ -16,15 +17,9 @@ type Provider = typeof AI_PROVIDERS[number];
 export default function Command(): JSX.Element {
   const preferences = getPreferenceValues<Preferences>();
 
-  const handleProviderSelect = async (providerId: Provider["id"]) => {
-    try {
-      await LocalStorage.setItem("preferredAiProvider", providerId);
-      const provider = AI_PROVIDERS.find(p => p.id === providerId);
-      await showHUD(`Switched to ${provider?.name}`);
-    } catch (error) {
-      console.error("Failed to switch AI provider:", error);
-      await showHUD("Failed to switch AI provider");
-    }
+  const handleProviderSelect = async (provider: Provider) => {
+    await LocalStorage.setItem("preferredAiProvider", provider.id);
+    await showHUD(`Switched to ${provider.name}`);
   };
 
   return React.createElement(
@@ -55,11 +50,29 @@ export default function Command(): JSX.Element {
         actions: React.createElement(
           ActionPanel,
           null,
-          React.createElement(Action, {
-            title: "Select Provider",
-            onAction: () => handleProviderSelect(provider.id),
-            icon: Icon.Switch
-          })
+          provider.id === "local" 
+            ? (preferences.localModelEndpoint
+              ? React.createElement(Action, {
+                  title: "Select Provider",
+                  onAction: () => handleProviderSelect(provider),
+                  icon: Icon.Switch
+                })
+              : React.createElement(Action, {
+                  title: "Configure Endpoint First",
+                  onAction: () => showHUD("Please configure the local model endpoint in preferences"),
+                  icon: Icon.Gear
+                }))
+            : (preferences[`${provider.id}ApiKey` as keyof Preferences]
+              ? React.createElement(Action, {
+                  title: "Select Provider",
+                  onAction: () => handleProviderSelect(provider),
+                  icon: Icon.Switch
+                })
+              : React.createElement(Action, {
+                  title: "Configure API Key First",
+                  onAction: () => showHUD("Please configure the API key in preferences"),
+                  icon: Icon.Gear
+                }))
         )
       })
     )

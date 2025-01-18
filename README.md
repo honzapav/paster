@@ -10,9 +10,10 @@ A Raycast extension for smart text formatting and pasting.
 - **Markdown Conversion**: Convert text to clean Markdown
 - **HTML Stripping**: Remove HTML formatting while preserving text structure
 - **AI Enhancement**: Optional AI-powered formatting improvements with choice of providers:
-  - OpenAI (GPT-4)
-  - Anthropic (Claude)
-  - Groq (Ultra-fast Mixtral)
+  - OpenAI (gpt-4o-mini)
+  - Anthropic (claude-3.5-haiku)
+  - Groq (mixtral-8x7b-32768)
+  - Gemini (gemini-1.5-flash-8b)
   - Local Model (self-hosted)
 
 ## Commands
@@ -27,9 +28,10 @@ A Raycast extension for smart text formatting and pasting.
 
 1. Install the extension from the Raycast store
 2. Optional: Set up AI enhancement by configuring your preferred provider:
-   - OpenAI API key for GPT-4 formatting
-   - Anthropic API key for Claude formatting
-   - Groq API key for ultra-fast formatting
+   - OpenAI API key for gpt-4o-mini formatting
+   - Anthropic API key for claude-3.5-haiku formatting
+   - Groq API key for mixtral-8x7b-32768 formatting
+   - Gemini API key for gemini-1.5-flash-8b formatting
    - Local model endpoint and name for using your own model
 
 ## Usage
@@ -45,7 +47,7 @@ A Raycast extension for smart text formatting and pasting.
 - Use `Smart Paste` when you want automatic format detection
 - Use `Convert to Markdown` for clean, portable formatting
 - Use `Strip Formatting` to remove all formatting while preserving structure
-- For fastest cloud processing, use Groq as your provider
+- For cloud processing, configure any of the available providers (OpenAI, Anthropic, Groq, or Gemini)
 - For offline use, configure any local model of your choice
 
 ## Local Model Setup

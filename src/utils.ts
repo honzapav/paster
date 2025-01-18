@@ -2,6 +2,7 @@ import { getPreferenceValues, showHUD, Clipboard } from "@raycast/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import { Groq } from "groq-sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import TurndownService from "turndown";
 import { htmlToText } from "html-to-text";
 import { prompts } from "./prompts";
@@ -13,9 +14,10 @@ interface Preferences {
   openaiApiKey?: string;
   anthropicApiKey?: string;
   groqApiKey?: string;
+  geminiApiKey?: string;
   localModelEndpoint?: string;
   localModelName?: string;
-  preferredAiProvider: "openai" | "anthropic" | "groq" | "local";
+  preferredAiProvider: "openai" | "anthropic" | "groq" | "gemini" | "local";
 }
 
 interface Prompt {
@@ -93,6 +95,7 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
       (preferences.preferredAiProvider === "openai" && preferences.openaiApiKey) ||
       (preferences.preferredAiProvider === "anthropic" && preferences.anthropicApiKey) ||
       (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) ||
+      (preferences.preferredAiProvider === "gemini" && preferences.geminiApiKey) ||
       (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint)
     )
   ) {
@@ -159,6 +162,17 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
         ],
       });
       return response.choices[0]?.message?.content || text;
+    } else if (preferences.preferredAiProvider === "gemini" && preferences.geminiApiKey) {
+      const genAI = getAiClient() as GoogleGenerativeAI;
+      const model = genAI.getGenerativeModel({ model: AI_MODELS.gemini.model });
+      
+      const prompt = currentPrompt.system 
+        ? `${currentPrompt.system}\n\n${currentPrompt.user.replace("{text}", text)}`
+        : currentPrompt.user.replace("{text}", text);
+      
+      const response = await model.generateContent(prompt);
+      const result = await response.response;
+      return result.text() || text;
     } else if (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint) {
       const endpoint = getAiClient() as string;
       if (!preferences.localModelName) {
@@ -269,8 +283,9 @@ export const getAiClient = () => {
     return new Anthropic({ apiKey: preferences.anthropicApiKey });
   } else if (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) {
     return new Groq({ apiKey: preferences.groqApiKey });
+  } else if (preferences.preferredAiProvider === "gemini" && preferences.geminiApiKey) {
+    return new GoogleGenerativeAI(preferences.geminiApiKey);
   } else if (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint) {
-    // For Ollama, we don't return a client, just the endpoint
     return preferences.localModelEndpoint;
   }
 

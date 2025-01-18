@@ -1,43 +1,54 @@
 export const AI_MODELS = {
   openai: {
-    model: "gpt-4o-mini", // Latest model optimized for speed and efficiency
+    model: "gpt-4o-mini",
     maxTokens: 1024,
-    temperature: 0.1, // Low temperature for more consistent formatting
+    temperature: 0.1, // Low temperature for consistent formatting
   },
   anthropic: {
-    model: "claude-3-5-haiku-latest", // Latest Haiku model - fastest Claude model
+    model: "claude-3-5-haiku-latest",
     maxTokens: 1024,
     temperature: 0.1,
   },
   groq: {
-    model: "mixtral-8x7b-32768", // Groq's fastest model
+    model: "mixtral-8x7b-32768",
     maxTokens: 1024,
-    temperature: 0.1, // Low temperature for consistent formatting
+    temperature: 0.1,
+  },
+  gemini: {
+    model: "gemini-1.5-flash-8b",
+    maxTokens: 1024,
+    temperature: 0.1,
   },
 } as const;
 
 export const AI_PROVIDERS = [
   {
     id: "openai" as const,
-    name: "OpenAI (GPT-4)",
+    name: "OpenAI (gpt-4o-mini)",
     icon: "Stars" as const,
     model: AI_MODELS.openai.model,
   },
   {
     id: "anthropic" as const,
-    name: "Anthropic (Claude)",
+    name: "Anthropic (claude-3.5-haiku)",
     icon: "LightBulb" as const,
     model: AI_MODELS.anthropic.model,
   },
   {
     id: "groq" as const,
-    name: "Groq (Ultra-fast)",
+    name: "Groq (mixtral-8x7b-32768)",
     icon: "Bolt" as const,
     model: AI_MODELS.groq.model,
   },
   {
+    id: "gemini" as const,
+    name: "Gemini (gemini-1.5-flash-8b)",
+    icon: "Wand" as const,
+    model: AI_MODELS.gemini.model,
+  },
+  {
     id: "local" as const,
     name: "Local Model",
-    icon: "Desktop" as const,
+    icon: "Laptop" as const,
   },
 ] as const;

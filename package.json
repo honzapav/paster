@@ -70,6 +70,13 @@
       "required": false
     },
     {
+      "name": "geminiApiKey",
+      "title": "Gemini API Key",
+      "description": "Your Google Gemini API key for fast AI transformations",
+      "type": "password",
+      "required": false
+    },
+    {
       "name": "localModelEndpoint",
       "title": "Local Model Endpoint",
       "description": "The endpoint URL for your local model server (e.g., http://localhost:11434 for Ollama, http://localhost:8080 for LocalAI)",
@@ -104,6 +111,10 @@
           "value": "groq"
         },
         {
+          "title": "Gemini (Flash)",
+          "value": "gemini"
+        },
+        {
           "title": "Local Model",
           "value": "local"
         }
@@ -112,6 +123,7 @@
   ],
   "dependencies": {
     "@anthropic-ai/sdk": "^0.14.1",
+    "@google/generative-ai": "^0.2.1",
     "@raycast/api": "^1.89.0",
     "@raycast/utils": "^1.18.1",
     "@types/html-to-text": "^9.0.4",
