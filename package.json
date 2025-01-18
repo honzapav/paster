@@ -27,6 +27,18 @@
       "title": "Paste as Html",
       "description": "Convert and paste text as clean HTML",
       "mode": "no-view"
+    },
+    {
+      "name": "paste-word",
+      "title": "Paste for Word",
+      "description": "Convert and paste text with Word-compatible formatting",
+      "mode": "no-view"
+    },
+    {
+      "name": "paste-web",
+      "title": "Paste for Web",
+      "description": "Convert and paste text with web-standard formatting",
+      "mode": "no-view"
     }
   ],
   "preferences": [

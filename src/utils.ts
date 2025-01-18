@@ -1,10 +1,11 @@
-import { getPreferenceValues, showHUD } from "@raycast/api";
+import { getPreferenceValues, showHUD, Clipboard } from "@raycast/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import TurndownService from "turndown";
 import { htmlToText } from "html-to-text";
 import { prompts } from "./prompts";
 import { AI_MODELS } from "./constants";
+import { execSync } from "child_process";
 
 interface Preferences {
   openaiApiKey?: string;
@@ -160,4 +161,69 @@ export const getAiClient = () => {
   }
 
   throw new Error("No AI provider configured. Please set up your API key in preferences.");
+};
+
+const createClipboardHtml = (html: string): string => {
+  const header = `Version:0.9
+StartHTML:00000097
+EndHTML:{END_HTML}
+StartFragment:00000133
+EndFragment:{END_FRAGMENT}`;
+
+  const beforeFragment = `<!DOCTYPE html><html><body><!--StartFragment-->`;
+  const afterFragment = '<!--EndFragment--></body></html>';
+
+  const fullHtml = `${header}\n${beforeFragment}${html}${afterFragment}`;
+  
+  // Calculate positions
+  const endFragment = beforeFragment.length + html.length + 97 + header.length + 1;
+  const endHtml = endFragment + afterFragment.length;
+  
+  return fullHtml
+    .replace('{END_HTML}', endHtml.toString().padStart(8, '0'))
+    .replace('{END_FRAGMENT}', endFragment.toString().padStart(8, '0'));
+};
+
+export const setClipboardContent = async (text: string, html: string): Promise<void> => {
+  await Clipboard.copy({
+    text: text,
+    html: html,
+  });
+};
+
+export const convertToWordFormat = async (text: string): Promise<string> => {
+  // First convert to clean HTML
+  let htmlText = await convertToHtml(text);
+  
+  // Add Word-specific styling (only structure, no fonts)
+  htmlText = htmlText
+    .replace(/<h1>/g, '<h1>')
+    .replace(/<h2>/g, '<h2>')
+    .replace(/<h3>/g, '<h3>')
+    .replace(/<p>/g, '<p>')
+    .replace(/<ul>/g, '<ul>')
+    .replace(/<ol>/g, '<ol>');
+  
+  return htmlText;
+};
+
+export const convertToWebFormat = async (text: string): Promise<string> => {
+  // First convert to clean HTML
+  let htmlText = await convertToHtml(text);
+  
+  // Add web-standard styling (only structure, no fonts)
+  htmlText = htmlText
+    .replace(/<h1>/g, '<h1>')
+    .replace(/<h2>/g, '<h2>')
+    .replace(/<h3>/g, '<h3>')
+    .replace(/<p>/g, '<p>')
+    .replace(/<ul>/g, '<ul>')
+    .replace(/<ol>/g, '<ol>');
+  
+  return htmlText;
+};
+
+export const pasteIntoActiveApp = async (): Promise<void> => {
+  // Use system paste command (Cmd+V)
+  execSync('osascript -e \'tell application "System Events" to keystroke "v" using command down\'');
 };

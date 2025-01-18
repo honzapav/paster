@@ -1,34 +1,41 @@
-# Clipboard Text Transformer
+# Paster
 
-A Raycast extension that helps you paste text with the desired formatting and optional AI-powered improvements.
+A Raycast extension for smart text formatting and pasting.
 
 ## Features
 
-- **Clean Text**: Remove all formatting, extra whitespace, and unwanted characters
-- **Markdown Conversion**: Convert text to clean Markdown format
-- **HTML Conversion**: Convert text to clean HTML format
-
-## Setup
-
-1. Install the extension in Raycast
-2. For AI-powered features (grammar fix):
-   - Get an API key from OpenAI or Anthropic
-   - Open Raycast Preferences
-   - Find the "Clipboard Text Transformer" extension
-   - Enter your API key in the preferences
-   - Choose your preferred AI provider
+- **Smart Paste**: Automatically formats text while preserving structure and meaning
+- **Word Formatting**: Paste text with Microsoft Word-compatible formatting
+- **Web-Standard Formatting**: Paste formatted text into web applications (Google Docs, Airtable, Asana, etc.)
+- **Markdown Conversion**: Convert text to clean Markdown
+- **HTML Stripping**: Remove HTML formatting while preserving text structure
+- **AI Enhancement**: Optional AI-powered formatting improvements
 
 ## Commands
 
-- `Paste Clean Text`: Paste clipboard content with all formatting removed
-- `Paste as Markdown`: Convert and paste clipboard content as clean Markdown
-- `Paste as HTML`: Convert and paste clipboard content as clean HTML
+- `Smart Paste`: Automatically detect and preserve text formatting
+- `Paste for Word`: Convert and paste text with Word-compatible formatting
+- `Paste for Web`: Convert and paste text with web-standard formatting (works in Google Docs, Airtable, Asana, and other web apps)
+- `Convert to Markdown`: Convert text to clean Markdown format
+- `Strip Formatting`: Remove all formatting while preserving text structure
 
-## Requirements
+## Setup
 
-- Raycast v1.89.0 or later
-- For AI features: OpenAI or Anthropic API key
+1. Install the extension from the Raycast store
+2. Optional: Set up AI enhancement by configuring your API key in preferences
+   - OpenAI API key for GPT-4 formatting
+   - Anthropic API key for Claude formatting
 
-## License
+## Usage
 
-MIT License - see LICENSE file for details
+1. Copy text from any source
+2. Use the appropriate Raycast command based on your target application
+3. The text will be automatically formatted and pasted
+
+## Tips
+
+- Use `Paste for Web` when working with any web-based editor (Google Docs, Airtable, Asana, etc.)
+- Use `Paste for Word` specifically for Microsoft Word
+- Use `Smart Paste` when you want automatic format detection
+- Use `Convert to Markdown` for clean, portable formatting
+- Use `Strip Formatting` to remove all formatting while preserving structure

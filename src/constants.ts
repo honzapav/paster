@@ -5,7 +5,7 @@ export const AI_MODELS = {
     temperature: 0.1, // Low temperature for more consistent formatting
   },
   anthropic: {
-    model: "claude-3-haiku-20241022", // Latest Haiku model - fastest Claude model
+    model: "claude-3-5-haiku-latest", // Latest Haiku model - fastest Claude model
     maxTokens: 1024,
     temperature: 0.1,
   },
