@@ -35,4 +35,9 @@ export const AI_PROVIDERS = [
     icon: "Bolt" as const,
     model: AI_MODELS.groq.model,
   },
+  {
+    id: "local" as const,
+    name: "Local Model",
+    icon: "Desktop" as const,
+  },
 ] as const;

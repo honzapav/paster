@@ -7,23 +7,93 @@ import { htmlToText } from "html-to-text";
 import { prompts } from "./prompts";
 import { AI_MODELS } from "./constants";
 import { execSync } from "child_process";
+import fetch from "node-fetch";
 
 interface Preferences {
   openaiApiKey?: string;
   anthropicApiKey?: string;
   groqApiKey?: string;
-  preferredAiProvider: "openai" | "anthropic" | "groq";
+  localModelEndpoint?: string;
+  localModelName?: string;
+  preferredAiProvider: "openai" | "anthropic" | "groq" | "local";
 }
+
+interface Prompt {
+  system?: string;
+  user: string;
+}
+
+// Add Ollama API call function
+const callOllama = async (endpoint: string, model: string, prompt: string): Promise<string> => {
+  try {
+    const response = await fetch(`${endpoint}/api/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        prompt: prompt,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Ollama API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data.response;
+  } catch (error) {
+    console.error('Ollama API error:', error);
+    throw error;
+  }
+};
+
+// Local model API call function
+const callLocalModel = async (endpoint: string, model: string, prompt: string): Promise<string> => {
+  try {
+    const response = await fetch(`${endpoint}/api/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        prompt: prompt,
+        stream: false,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Local model API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    // Handle different response formats
+    if (typeof data.response === 'string') return data.response;  // Ollama format
+    if (typeof data.generated_text === 'string') return data.generated_text;  // Some other servers
+    if (typeof data.text === 'string') return data.text;  // Generic format
+    if (typeof data.content === 'string') return data.content;  // Another common format
+    
+    throw new Error('Unexpected response format from local model server');
+  } catch (error) {
+    console.error('Local model API error:', error);
+    throw error;
+  }
+};
 
 const formatWithAI = async (text: string, promptType: keyof typeof prompts): Promise<string> => {
   const preferences = getPreferenceValues<Preferences>();
+  const currentPrompt = prompts[promptType] as Prompt;
 
   // If no AI is configured, return early
   if (
     !(
       (preferences.preferredAiProvider === "openai" && preferences.openaiApiKey) ||
       (preferences.preferredAiProvider === "anthropic" && preferences.anthropicApiKey) ||
-      (preferences.preferredAiProvider === "groq" && preferences.groqApiKey)
+      (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) ||
+      (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint)
     )
   ) {
     return text;
@@ -38,17 +108,17 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
         max_tokens: AI_MODELS.openai.maxTokens,
         temperature: AI_MODELS.openai.temperature,
         messages: [
-          ...(prompts[promptType].system
+          ...(currentPrompt.system
             ? [
                 {
                   role: "system" as const,
-                  content: prompts[promptType].system,
+                  content: currentPrompt.system,
                 },
               ]
             : []),
           {
             role: "user" as const,
-            content: prompts[promptType].user.replace("{text}", text),
+            content: currentPrompt.user.replace("{text}", text),
           },
         ],
       });
@@ -62,7 +132,7 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
         messages: [
           {
             role: "user",
-            content: prompts[promptType].user.replace("{text}", text),
+            content: currentPrompt.user.replace("{text}", text),
           },
         ],
       });
@@ -74,21 +144,35 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
         max_tokens: AI_MODELS.groq.maxTokens,
         temperature: AI_MODELS.groq.temperature,
         messages: [
-          ...(prompts[promptType].system
+          ...(currentPrompt.system
             ? [
                 {
                   role: "system" as const,
-                  content: prompts[promptType].system,
+                  content: currentPrompt.system,
                 },
               ]
             : []),
           {
             role: "user" as const,
-            content: prompts[promptType].user.replace("{text}", text),
+            content: currentPrompt.user.replace("{text}", text),
           },
         ],
       });
       return response.choices[0]?.message?.content || text;
+    } else if (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint) {
+      const endpoint = getAiClient() as string;
+      if (!preferences.localModelName) {
+        throw new Error("Local model name not configured. Please set it in preferences.");
+      }
+      const prompt = currentPrompt.system 
+        ? `${currentPrompt.system}\n\n${currentPrompt.user.replace("{text}", text)}`
+        : currentPrompt.user.replace("{text}", text);
+      
+      return await callLocalModel(
+        endpoint,
+        preferences.localModelName,
+        prompt
+      );
     }
   } catch (error) {
     console.error("AI formatting failed:", error);
@@ -185,9 +269,12 @@ export const getAiClient = () => {
     return new Anthropic({ apiKey: preferences.anthropicApiKey });
   } else if (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) {
     return new Groq({ apiKey: preferences.groqApiKey });
+  } else if (preferences.preferredAiProvider === "local" && preferences.localModelEndpoint) {
+    // For Ollama, we don't return a client, just the endpoint
+    return preferences.localModelEndpoint;
   }
 
-  throw new Error("No AI provider configured. Please set up your API key in preferences.");
+  throw new Error("No AI provider configured. Please set up your provider in preferences.");
 };
 
 const createClipboardHtml = (html: string): string => {

@@ -13,6 +13,7 @@ A Raycast extension for smart text formatting and pasting.
   - OpenAI (GPT-4)
   - Anthropic (Claude)
   - Groq (Ultra-fast Mixtral)
+  - Local Model (self-hosted)
 
 ## Commands
 
@@ -29,6 +30,7 @@ A Raycast extension for smart text formatting and pasting.
    - OpenAI API key for GPT-4 formatting
    - Anthropic API key for Claude formatting
    - Groq API key for ultra-fast formatting
+   - Local model endpoint and name for using your own model
 
 ## Usage
 
@@ -43,4 +45,33 @@ A Raycast extension for smart text formatting and pasting.
 - Use `Smart Paste` when you want automatic format detection
 - Use `Convert to Markdown` for clean, portable formatting
 - Use `Strip Formatting` to remove all formatting while preserving structure
-- For fastest AI processing, use Groq as your provider
+- For fastest cloud processing, use Groq as your provider
+- For offline use, configure any local model of your choice
+
+## Local Model Setup
+
+To use a local model, you'll need:
+
+1. A running model server that accepts text generation requests
+2. Configure in Raycast preferences:
+   - Set endpoint URL (e.g., `http://localhost:11434` for Ollama)
+   - Set model name as expected by your server
+
+Example setups:
+- **Ollama**:
+  - Install from https://ollama.ai
+  - Pull your model: `ollama pull llama2`
+  - Endpoint: `http://localhost:11434`
+  - Model name: `llama2`
+
+- **LocalAI**:
+  - Set up LocalAI server
+  - Endpoint: `http://localhost:8080`
+  - Model name: matches your loaded model
+
+- **Text Generation WebUI**:
+  - Run with API enabled
+  - Endpoint: `http://localhost:5000`
+  - Model name: as configured in your setup
+
+Note: The local model integration uses a simple generate endpoint (`/api/generate`). Make sure your model server provides a compatible API or adjust the code as needed.

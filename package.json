@@ -70,6 +70,20 @@
       "required": false
     },
     {
+      "name": "localModelEndpoint",
+      "title": "Local Model Endpoint",
+      "description": "The endpoint URL for your local model server (e.g., http://localhost:11434 for Ollama, http://localhost:8080 for LocalAI)",
+      "type": "textfield",
+      "required": false
+    },
+    {
+      "name": "localModelName",
+      "title": "Local Model Name",
+      "description": "The name of your local model as expected by your model server",
+      "type": "textfield",
+      "required": false
+    },
+    {
       "name": "preferredAiProvider",
       "title": "Preferred AI Provider",
       "description": "Choose which AI provider to use for transformations",
@@ -88,6 +102,10 @@
         {
           "title": "Groq (Fastest)",
           "value": "groq"
+        },
+        {
+          "title": "Local Model",
+          "value": "local"
         }
       ]
     }
@@ -97,14 +115,17 @@
     "@raycast/api": "^1.89.0",
     "@raycast/utils": "^1.18.1",
     "@types/html-to-text": "^9.0.4",
+    "@types/node-fetch": "^2.6.11",
     "@types/turndown": "^5.0.5",
     "groq-sdk": "^0.3.1",
     "html-to-text": "^9.0.5",
+    "node-fetch": "^2.7.0",
     "openai": "^4.79.0",
     "turndown": "^7.2.0"
   },
   "devDependencies": {
     "@raycast/eslint-config": "1.0.5",
+    "@types/hoist-non-react-statics": "^3.3.5",
     "@types/node": "20.8.10",
     "@types/react": "18.3.3",
     "eslint": "8.15.0",

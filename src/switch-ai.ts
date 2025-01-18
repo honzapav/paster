@@ -6,7 +6,9 @@ interface Preferences {
   openaiApiKey?: string;
   anthropicApiKey?: string;
   groqApiKey?: string;
-  preferredAiProvider: "openai" | "anthropic" | "groq";
+  localModelEndpoint?: string;
+  localModelName?: string;
+  preferredAiProvider: "openai" | "anthropic" | "groq" | "local";
 }
 
 type Provider = typeof AI_PROVIDERS[number];
