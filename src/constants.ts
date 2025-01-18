@@ -9,4 +9,9 @@ export const AI_MODELS = {
     maxTokens: 1024,
     temperature: 0.1,
   },
+  groq: {
+    model: "mixtral-8x7b-32768", // Groq's fastest model
+    maxTokens: 1024,
+    temperature: 0.1, // Low temperature for consistent formatting
+  },
 } as const;

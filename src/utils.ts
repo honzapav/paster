@@ -1,6 +1,7 @@
 import { getPreferenceValues, showHUD, Clipboard } from "@raycast/api";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import { Groq } from "groq-sdk";
 import TurndownService from "turndown";
 import { htmlToText } from "html-to-text";
 import { prompts } from "./prompts";
@@ -10,7 +11,8 @@ import { execSync } from "child_process";
 interface Preferences {
   openaiApiKey?: string;
   anthropicApiKey?: string;
-  preferredAiProvider: "openai" | "anthropic";
+  groqApiKey?: string;
+  preferredAiProvider: "openai" | "anthropic" | "groq";
 }
 
 const formatWithAI = async (text: string, promptType: keyof typeof prompts): Promise<string> => {
@@ -20,7 +22,8 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
   if (
     !(
       (preferences.preferredAiProvider === "openai" && preferences.openaiApiKey) ||
-      (preferences.preferredAiProvider === "anthropic" && preferences.anthropicApiKey)
+      (preferences.preferredAiProvider === "anthropic" && preferences.anthropicApiKey) ||
+      (preferences.preferredAiProvider === "groq" && preferences.groqApiKey)
     )
   ) {
     return text;
@@ -64,6 +67,28 @@ const formatWithAI = async (text: string, promptType: keyof typeof prompts): Pro
         ],
       });
       return response.content[0]?.text || text;
+    } else if (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) {
+      const groq = getAiClient() as Groq;
+      const response = await groq.chat.completions.create({
+        model: AI_MODELS.groq.model,
+        max_tokens: AI_MODELS.groq.maxTokens,
+        temperature: AI_MODELS.groq.temperature,
+        messages: [
+          ...(prompts[promptType].system
+            ? [
+                {
+                  role: "system" as const,
+                  content: prompts[promptType].system,
+                },
+              ]
+            : []),
+          {
+            role: "user" as const,
+            content: prompts[promptType].user.replace("{text}", text),
+          },
+        ],
+      });
+      return response.choices[0]?.message?.content || text;
     }
   } catch (error) {
     console.error("AI formatting failed:", error);
@@ -158,6 +183,8 @@ export const getAiClient = () => {
     return new OpenAI({ apiKey: preferences.openaiApiKey });
   } else if (preferences.preferredAiProvider === "anthropic" && preferences.anthropicApiKey) {
     return new Anthropic({ apiKey: preferences.anthropicApiKey });
+  } else if (preferences.preferredAiProvider === "groq" && preferences.groqApiKey) {
+    return new Groq({ apiKey: preferences.groqApiKey });
   }
 
   throw new Error("No AI provider configured. Please set up your API key in preferences.");

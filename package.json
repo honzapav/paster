@@ -57,6 +57,13 @@
       "required": false
     },
     {
+      "name": "groqApiKey",
+      "title": "Groq API Key",
+      "description": "Your Groq API key for ultra-fast AI transformations",
+      "type": "password",
+      "required": false
+    },
+    {
       "name": "preferredAiProvider",
       "title": "Preferred AI Provider",
       "description": "Choose which AI provider to use for transformations",
@@ -71,6 +78,10 @@
         {
           "title": "Anthropic",
           "value": "anthropic"
+        },
+        {
+          "title": "Groq (Fastest)",
+          "value": "groq"
         }
       ]
     }
@@ -81,6 +92,7 @@
     "@raycast/utils": "^1.18.1",
     "@types/html-to-text": "^9.0.4",
     "@types/turndown": "^5.0.5",
+    "groq-sdk": "^0.3.1",
     "html-to-text": "^9.0.5",
     "openai": "^4.79.0",
     "turndown": "^7.2.0"
