@@ -39,6 +39,12 @@
       "title": "Paste for Web",
       "description": "Convert and paste text with web-standard formatting",
       "mode": "no-view"
+    },
+    {
+      "name": "switch-ai",
+      "title": "Switch AI Provider",
+      "description": "Switch between available AI providers",
+      "mode": "view"
     }
   ],
   "preferences": [
