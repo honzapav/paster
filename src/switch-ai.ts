@@ -36,13 +36,20 @@ export default function Command(): JSX.Element {
     AI_PROVIDERS.map((provider) =>
       React.createElement(List.Item, {
         key: provider.id,
-        icon: Icon[provider.icon],
+        icon: Icon[provider.icon as keyof typeof Icon],
         title: provider.name,
         accessories: [
-          { icon: preferences.preferredAiProvider === provider.id ? Icon.CheckCircle : undefined },
+          {
+            icon: preferences.preferredAiProvider === provider.id ? Icon.CheckCircle : undefined,
+            tooltip: preferences.preferredAiProvider === provider.id ? "Currently selected" : undefined
+          },
           { 
-            icon: !!preferences[`${provider.id}ApiKey` as keyof Preferences] ? Icon.Key : Icon.ExclamationMark,
-            tooltip: !!preferences[`${provider.id}ApiKey` as keyof Preferences] ? "API Key configured" : "API Key missing"
+            icon: provider.id === "local" 
+              ? (!!preferences.localModelEndpoint ? Icon.Key : Icon.ExclamationMark)
+              : (!!preferences[`${provider.id}ApiKey` as keyof Preferences] ? Icon.Key : Icon.ExclamationMark),
+            tooltip: provider.id === "local"
+              ? (!!preferences.localModelEndpoint ? "Endpoint configured" : "Endpoint missing")
+              : (!!preferences[`${provider.id}ApiKey` as keyof Preferences] ? "API Key configured" : "API Key missing")
           }
         ],
         actions: React.createElement(
