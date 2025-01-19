@@ -16,9 +16,17 @@ type Provider = typeof AI_PROVIDERS[number];
 
 export default function Command(): JSX.Element {
   const preferences = getPreferenceValues<Preferences>();
+  const [currentProvider, setCurrentProvider] = React.useState<string>("openai");
+
+  React.useEffect(() => {
+    LocalStorage.getItem<string>("preferredAiProvider").then((value) => {
+      if (value) setCurrentProvider(value);
+    });
+  }, []);
 
   const handleProviderSelect = async (provider: Provider) => {
     await LocalStorage.setItem("preferredAiProvider", provider.id);
+    setCurrentProvider(provider.id);
     await showHUD(`Switched to ${provider.name}`);
   };
 
@@ -35,8 +43,8 @@ export default function Command(): JSX.Element {
         title: provider.name,
         accessories: [
           {
-            icon: preferences.preferredAiProvider === provider.id ? Icon.CheckCircle : undefined,
-            tooltip: preferences.preferredAiProvider === provider.id ? "Currently selected" : undefined
+            icon: currentProvider === provider.id ? Icon.CheckCircle : undefined,
+            tooltip: currentProvider === provider.id ? "Currently selected" : undefined
           },
           { 
             icon: provider.id === "local" 
